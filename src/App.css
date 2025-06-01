@@ -65,18 +65,20 @@ body {
   font-size: 0.9em;
   font-weight: 500;
   color: #586069;
-  padding: 10px 15px;
+  padding: 10px 15px; /* Keep padding for touch targets */
   border-radius: 6px;
   background-color: transparent;
   cursor: pointer;
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out,
     border-color 0.15s ease-in-out;
   margin-bottom: 8px;
-  text-align: left;
-  width: 90%;
-  max-width: 190px;
+  /* width: 90%; REMOVE or change to auto */
+  width: auto; /* Make button as wide as its content */
+  display: inline-block; /* To work well with parent's centering */
+  max-width: 190px; /* Still good to have a max-width */
   border: 1px solid transparent;
-  display: block;
+  /* text-align: left; REMOVE or change to center */
+  text-align: center; /* Center text within the auto-width button */
 }
 
 .assignment-nav-item:hover:not(.active) {
@@ -107,16 +109,28 @@ body {
 
 .github-link-button {
   /* Specific class for the GitHub link button */
-  width: 100%; /* Make the button take the full width of its container */
-  /* It uses .button-animated as its base */
-  font-size: 0.85em !important; /* Make GitHub button text slightly smaller */
-  padding-top: 9px !important; /* Adjust padding for smaller size */
-  padding-bottom: 9px !important; /* Adjust padding for smaller size */
+  /* Inherit/apply alignment properties similar to .assignment-nav-item */
+  width: 90%; /* <<< MATCH .assignment-nav-item's width percentage */
+  max-width: 190px; /* <<< MATCH .assignment-nav-item's max-width */
+  /* text-align: left; */ /* <<< MATCH .assignment-nav-item's text-align (e.g., left or center) */
+  /* The text within .button-animated is centered by default due to justify-content: center on the button itself.
+                         If .assignment-nav-item is text-align: left, this might not be directly applicable unless
+                         you change .button-animated's justify-content for this specific button.
+                         However, .button-animated already centers its content (text + icon).
+                         The key is that the BLOCK of the button is sized and positioned like .assignment-nav-item.
+                      */
+
+  /* It uses .button-animated as its base for look and feel */
+  /* Overrides for size/padding if you made it smaller previously: */
+  font-size: 0.85em !important;
+  padding-top: 9px !important;
+  padding-bottom: 9px !important;
+  display: inline-flex; /* Ensures it behaves like other buttons if width is auto, but here width is fixed % */
 }
 
 .github-link-button .button-icon-right {
-  font-size: 1em !important; /* Ensure icon size is appropriate */
-  margin-left: 6px !important; /* Slightly less margin for smaller button */
+  font-size: 1em !important;
+  margin-left: 6px !important;
 }
 
 /* --- Main Content Area --- */
@@ -383,13 +397,7 @@ select:disabled {
     flex-direction: row; /* Align items in a row */
     align-items: center;
   }
-  .assignment-nav-item {
-    width: auto; /* Auto width for items in a row */
-    min-width: 100px; /* Minimum width for readability */
-    margin-right: 8px;
-    margin-bottom: 0; /* No bottom margin in row layout */
-    text-align: center; /* Center text for smaller tab-like items */
-  }
+
   .sidebar-footer-nav {
     /* Adjust for mobile */
     width: auto; /* Allow it to shrink or grow based on content */

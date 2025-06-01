@@ -153,7 +153,7 @@ const TodoList = () => {
           className="button-animated todo-add-button-specifics"
         >
           <span className="button-text">Add Task</span>
-          <span className="button-icon-right">→</span>
+          <span className="button-icon-right">↓</span>
         </button>
       </form>
       {error && <p className="error-message">{error}</p>}{" "}
