@@ -1,13 +1,15 @@
 /* src/components/TodoList/TodoList.css */
+
+/* --- Container for the TodoList --- */
 .todo-list-container {
   background-color: #ffffff;
   padding: 25px 30px;
   border-radius: 12px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 550px; /* Slightly wider than form */
-  margin: 20px auto;
-  font-family: "Inter", sans-serif;
+  max-width: 550px; /* Max width for the todo card */
+  margin: 0 auto; /* Centered by main-content-wrapper in App.js */
+  font-family: "Inter", sans-serif; /* Ensure font consistency if not inherited perfectly */
 }
 
 .todo-list-container h2 {
@@ -17,48 +19,42 @@
   font-weight: 600;
 }
 
+/* --- Add Task Form --- */
 .todo-add-form {
   display: flex;
-  margin-bottom: 10px; /* Space before error message */
+  margin-bottom: 10px; /* Space before error message if it appears */
 }
 
-.todo-input {
+/* Specifics for the TodoList input, building on .common-input-style from App.css */
+.todo-input-specifics {
   flex-grow: 1;
-  padding: 10px 12px;
-  border: 1px solid #d1d1d1;
-  border-radius: 6px 0 0 6px; /* Rounded left corners */
-  font-size: 0.95rem;
-  outline: none;
-}
-.todo-input:focus {
-  border-color: #007aff;
-  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+  /* Base styles like padding, border, font-size come from .common-input-style */
+  border-top-right-radius: 0 !important; /* Ensure flat edge to meet button */
+  border-bottom-right-radius: 0 !important; /* Ensure flat edge to meet button */
+  /* No need to redefine focus style if .common-input-style:focus is good */
 }
 
-.todo-add-button {
-  padding: 10px 15px;
-  background-color: #007aff; /* Apple blue */
-  color: white;
-  border: none;
-  border-radius: 0 6px 6px 0; /* Rounded right corners */
-  font-size: 0.95rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-.todo-add-button:hover {
-  background-color: #005ecb;
+/* Specifics for the Add Task button, building on .button-animated from App.css */
+.todo-add-button-specifics {
+  border-top-left-radius: 0 !important; /* Ensure flat edge to meet input */
+  border-bottom-left-radius: 0 !important; /* Ensure flat edge to meet input */
+  padding-top: 10px !important; /* Ensure height matches input if base button padding differs */
+  padding-bottom: 10px !important; /* Ensure height matches input */
+  flex-shrink: 0; /* Prevent button from shrinking */
 }
 
-.todo-error-message {
-  color: #ff3b30; /* Apple red */
-  font-size: 0.85em;
+/* .error-message styles are now primarily from App.css */
+/* If specific alignment or margin is needed for errors *within* TodoList:
+.todo-list-container .error-message {
+  text-align: left; // Or center, depending on desired look for this component
   margin-bottom: 15px;
-  text-align: center;
 }
+*/
 
+/* --- Controls Area (count, filters, sort, clear) --- */
 .todo-controls {
   display: flex;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
   justify-content: space-between;
   align-items: center;
   padding: 10px 0;
@@ -67,38 +63,57 @@
   border-bottom: 1px solid #eee;
   font-size: 0.9em;
   color: #555;
+  gap: 10px; /* Adds space between flex items when they wrap */
 }
 
-.todo-filters button {
-  background: none;
-  border: 1px solid transparent;
-  color: #555;
-  margin: 0 5px;
-  padding: 5px 8px;
-  border-radius: 4px;
-  cursor: pointer;
+.todo-count {
+  flex-shrink: 0; /* Prevent count from shrinking */
+}
+
+/* Filter buttons use .button-utility from App.css */
+.todo-filters {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Space between filter buttons */
+  flex-shrink: 0;
+}
+/* .todo-filters .button-utility.active style is already in App.css */
+
+/* Sort Dropdown Specifics */
+.todo-sort {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.todo-sort-label {
   font-size: 0.95em;
+  color: #555;
 }
-.todo-filters button:hover {
-  border-color: #ddd;
-}
-.todo-filters button.active {
-  border-color: #007aff;
-  color: #007aff;
-  font-weight: 500;
-}
-.todo-clear-completed {
-  background: none;
-  border: none;
-  color: #777;
-  cursor: pointer;
+.todo-sort-select {
+  /* Leverages base select styles from App.css */
+  padding: 6px 8px; /* Slightly smaller padding for a compact select */
   font-size: 0.9em;
-}
-.todo-clear-completed:hover {
-  color: #ff3b30;
-  text-decoration: underline;
+  min-width: 120px; /* Give it some space */
 }
 
+/* Clear Completed button uses .button-utility */
+.todo-clear-completed-specifics {
+  /* Base style from .button-utility in App.css */
+  color: #777; /* Override default utility color */
+  border: none; /* Make it look more like a link */
+  padding: 5px; /* Minimal padding */
+  background-color: transparent !important; /* Ensure no bg from utility */
+  flex-shrink: 0;
+}
+.todo-clear-completed-specifics:hover:not(:disabled) {
+  color: #ff3b30 !important; /* Override utility hover color */
+  text-decoration: underline;
+  background-color: transparent !important; /* Ensure no bg on hover */
+  border-color: transparent !important; /* Ensure no border on hover */
+}
+
+/* --- Task Items List --- */
 .todo-items-list {
   list-style: none;
   padding: 0;
@@ -109,7 +124,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 5px; /* Added more padding */
+  padding: 12px 5px;
   border-bottom: 1px solid #f0f0f0;
   transition: background-color 0.2s ease;
 }
@@ -117,27 +132,30 @@
   border-bottom: none;
 }
 .todo-item:hover {
-  background-color: #f9f9f9;
+  background-color: #f9f9f9; /* Subtle hover for the whole item */
 }
 
 .todo-item-content {
   display: flex;
   align-items: center;
   flex-grow: 1;
+  overflow: hidden; /* To contain long text */
 }
 
 .todo-item-checkbox {
   margin-right: 12px;
-  width: 18px; /* Custom checkbox size */
+  width: 18px;
   height: 18px;
   cursor: pointer;
-  accent-color: #007aff; /* Colors the checkmark and box when checked */
+  accent-color: #007aff; /* For modern browsers, styles the checkbox itself */
+  flex-shrink: 0; /* Prevent checkbox from shrinking */
 }
 
 .todo-item-text {
   font-size: 1rem;
   color: #333;
-  word-break: break-word; /* Prevent long text from breaking layout */
+  word-break: break-word;
+  margin-right: 10px; /* Space before remove button */
 }
 
 .todo-item.completed .todo-item-text {
@@ -145,24 +163,29 @@
   color: #999;
 }
 
-.todo-remove-button {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 1.4em; /* Larger remove button */
+/* Remove ('X') button specifics, using .button-utility as base */
+.todo-remove-button-specifics {
+  /* Base style from .button-utility */
+  font-size: 1.4em !important; /* Override utility font size */
   font-weight: bold;
-  cursor: pointer;
-  padding: 0 5px; /* Add some padding for easier clicking */
   line-height: 1;
-  transition: color 0.2s ease;
+  padding: 0 5px !important; /* Override utility padding */
+  color: #aaa !important; /* Override utility color */
+  border: none !important; /* Remove border from utility */
+  background-color: transparent !important; /* Ensure no bg */
+  flex-shrink: 0; /* Prevent button from shrinking */
 }
-.todo-remove-button:hover {
-  color: #ff3b30; /* Apple red */
+.todo-remove-button-specifics:hover:not(:disabled) {
+  color: #ff3b30 !important; /* Override utility hover */
+  background-color: transparent !important;
+  border-color: transparent !important;
 }
 
+/* --- Empty State Message --- */
 .todo-empty-message {
   text-align: center;
   color: #777;
   margin-top: 20px;
+  padding: 10px;
   font-style: italic;
 }

@@ -337,8 +337,8 @@ const RegistrationForm = ({ onSubmitSuccess }) => {
 
   // --- Placeholders ---
   const placeholders = {
-    firstName: "e.g., Sarah (letters only)",
-    lastName: "e.g., Connor (letters only)",
+    firstName: "e.g., Harshal (letters only)",
+    lastName: "e.g., Patel (letters only)",
     username: "e.g., sarah_c (3-16 chars, starts letter)",
     email: "name@example.com",
     password: "Min 12 chars (Aa1!@#)",

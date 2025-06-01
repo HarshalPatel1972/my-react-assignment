@@ -1,8 +1,14 @@
 /* src/App.css */
 
 /* --- Global Resets & Body Styles --- */
+/* These are now primarily in index.css. This section can be removed if index.css covers it.
+   If you prefer them here, ensure they don't conflict or duplicate index.css.
+   For this update, I'll assume index.css handles the very base html, body, #root.
+   If any specific body override is needed for App.js context, it can stay.
+   Your provided App.css has some body styles, let's keep them for now but be mindful of index.css.
+*/
 html,
-body,
+body, /* Keeping body here as per your provided file, but check against index.css */
 #root {
   height: 100%;
   margin: 0;
@@ -37,13 +43,22 @@ body {
 /* --- Sidebar --- */
 .app-sidebar {
   width: 220px;
-  padding: 25px 10px;
+  padding: 25px 10px; /* Adjusted top/bottom padding */
   background-color: #f5f2eb;
   border-right: 1px solid #e0dace;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* align-items: center; <-- This will be handled by .sidebar-main-nav and .sidebar-footer-nav */
   flex-shrink: 0;
+}
+
+/* Wrapper for main navigation items in sidebar */
+.sidebar-main-nav {
+  flex-grow: 1; /* Pushes footer nav down */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the nav items if they are narrower */
 }
 
 .assignment-nav-item {
@@ -54,7 +69,8 @@ body {
   border-radius: 6px;
   background-color: transparent;
   cursor: pointer;
-  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
   margin-bottom: 8px;
   text-align: left;
   width: 90%;
@@ -66,6 +82,7 @@ body {
 .assignment-nav-item:hover:not(.active) {
   background-color: #e9e5e0;
   color: #24292e;
+  border-color: #d1c9c0; /* Subtle border on hover for non-active */
 }
 
 .assignment-nav-item.active {
@@ -75,6 +92,31 @@ body {
   border-color: #e1e4e8;
   box-shadow: 0 1px 2px rgba(27, 31, 35, 0.075);
   cursor: default;
+}
+
+/* Wrapper for the GitHub link button at the bottom of the sidebar */
+.sidebar-footer-nav {
+  width: 90%; /* Match width of other nav items for consistency */
+  max-width: 190px; /* Match max-width */
+  margin-top: auto; /* Pushes this to the bottom of the sidebar flex container */
+  padding-top: 20px; /* Space above the GitHub button */
+  padding-bottom: 15px; /* Space at the very bottom of the sidebar */
+  display: flex;
+  justify-content: center;
+}
+
+.github-link-button {
+  /* Specific class for the GitHub link button */
+  width: 100%; /* Make the button take the full width of its container */
+  /* It uses .button-animated as its base */
+  font-size: 0.85em !important; /* Make GitHub button text slightly smaller */
+  padding-top: 9px !important; /* Adjust padding for smaller size */
+  padding-bottom: 9px !important; /* Adjust padding for smaller size */
+}
+
+.github-link-button .button-icon-right {
+  font-size: 1em !important; /* Ensure icon size is appropriate */
+  margin-left: 6px !important; /* Slightly less margin for smaller button */
 }
 
 /* --- Main Content Area --- */
@@ -93,7 +135,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-bottom: 30px;
+  padding-bottom: 40px; /* Increased padding for more space above footer */
   flex-grow: 1;
 }
 
@@ -118,7 +160,9 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="tel"],
-select {
+select,
+.common-input-style {
+  /* Added .common-input-style for TodoList input */
   width: 100%;
   padding: 10px 12px;
   border: 1px solid #d1d1d1;
@@ -130,7 +174,8 @@ select {
 }
 
 input:focus,
-select:focus {
+select:focus,
+.common-input-style:focus {
   outline: none;
   border-color: #007aff;
   box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
@@ -148,23 +193,26 @@ select:disabled {
   display: block;
 }
 
-/* --- New Animated Common Button Style --- */
+/* --- Enhanced Animated Common Button Style --- */
 .button-animated {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 20px;
-  background-color: #282828;
+  padding: 12px 24px; /* Slightly more padding for primary actions */
+  background-image: linear-gradient(
+    to bottom,
+    #3e3e3e 0%,
+    #282828 100%
+  ); /* Subtle gradient */
   color: white;
-  border: none;
+  border: 1px solid #1a1a1a; /* Adding a subtle border */
   font-family: "Inter", sans-serif;
   font-size: 1rem;
   font-weight: 600;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out,
-    transform 0.2s ease-in-out;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1); /* Unified transition */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1); /* Softer, layered shadow */
   text-decoration: none;
   position: relative;
   overflow: hidden;
@@ -173,19 +221,21 @@ select:disabled {
 .button-animated .button-text {
   transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   display: inline-block;
+  z-index: 1;
 }
 
 .button-animated .button-icon-right {
   margin-left: 8px;
   opacity: 0;
-  transform: translateX(10px);
+  transform: translateX(15px); /* Start a bit further */
   transition: opacity 0.3s cubic-bezier(0.25, 0.1, 0.25, 1),
     transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   font-size: 1.1em;
+  z-index: 1;
 }
 
 .button-animated:hover .button-text {
-  transform: translateX(-10px);
+  transform: translateX(-12px); /* Shift text a bit more */
 }
 
 .button-animated:hover .button-icon-right {
@@ -194,55 +244,87 @@ select:disabled {
 }
 
 .button-animated:hover:not(:disabled) {
-  background-color: #1a1a1a;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(
+    to bottom,
+    #4a4a4a 0%,
+    #303030 100%
+  ); /* Lighter gradient on hover */
+  border-color: #000; /* Darker border on hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 12px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
+  /* transform: translateY(-2px); Lift effect */
+}
+
+.button-animated:active:not(:disabled) {
+  /* Pressed state */
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); /* Flatter shadow when pressed */
+  background-image: linear-gradient(
+    to top,
+    #3e3e3e 0%,
+    #282828 100%
+  ); /* Invert gradient slightly */
 }
 
 .button-animated:disabled {
+  background-image: none; /* Remove gradient for disabled */
   background-color: #cccccc;
-  color: #666666;
+  color: #888888; /* Lighter text color for disabled */
+  border-color: #bbb;
   cursor: not-allowed;
   box-shadow: none;
+  opacity: 0.7;
 }
 .button-animated:disabled .button-text {
   transform: none !important;
-  opacity: 0.6 !important;
+  opacity: 0.7 !important;
 }
 .button-animated:disabled .button-icon-right {
   opacity: 0 !important;
   transform: none !important;
 }
 
-/* --- Utility/Small Buttons --- */
+/* --- Enhanced Utility/Small Buttons --- */
 .button-utility {
-  background: none;
-  border: 1px solid #d1d1d1;
-  color: #555;
-  padding: 6px 10px;
-  border-radius: 5px;
+  background-color: #f8f9fa; /* Light grey background */
+  border: 1px solid #ced4da; /* Standard border color */
+  color: #495057; /* Darker text for better contrast */
+  padding: 6px 12px; /* Slightly more padding */
+  border-radius: 6px; /* Slightly more rounded */
   cursor: pointer;
-  font-size: 0.85em;
+  font-size: 0.9em; /* Slightly larger */
   font-weight: 500;
-  transition: background-color 0.2s ease, color 0.2s ease,
-    border-color 0.2s ease;
-  display: inline-flex; /* For potential icons if ever added */
+  transition: all 0.2s ease;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  line-height: 1.3; /* Improved line height */
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  text-decoration: none; /* For <a> tags styled as buttons */
 }
 .button-utility:hover:not(:disabled) {
-  background-color: #f0f0f0;
-  border-color: #bbb;
-  color: #333;
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  color: #212529;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 .button-utility.active {
-  background-color: #e0e7ff;
-  border-color: #007aff;
-  color: #007aff;
+  /* For filter buttons in TodoList */
+  background-color: #007bff; /* Standard primary blue */
+  border-color: #007bff;
+  color: white;
   font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.button-utility.active:hover:not(:disabled) {
+  /* Hover for active utility button */
+  background-color: #0069d9;
+  border-color: #0062cc;
 }
 .button-utility:disabled {
-  opacity: 0.5;
+  opacity: 0.65;
   cursor: not-allowed;
+  background-color: #e9ecef;
+  border-color: #ced4da;
 }
 
 /* --- Footer --- */
@@ -291,19 +373,39 @@ select:disabled {
     border-bottom: 1px solid #e0dace;
     padding: 15px 10px;
     flex-direction: row;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    justify-content: flex-start; /* Align items to start */
+    flex-wrap: nowrap; /* Prevent wrapping to keep it tab-like */
+    overflow-x: auto; /* Allow horizontal scroll for nav items if they exceed width */
+  }
+  .sidebar-main-nav {
+    /* Adjust for horizontal layout on mobile */
+    flex-grow: 0; /* Don't grow in row layout */
+    flex-direction: row; /* Align items in a row */
+    align-items: center;
   }
   .assignment-nav-item {
-    width: auto;
-    min-width: 100px;
+    width: auto; /* Auto width for items in a row */
+    min-width: 100px; /* Minimum width for readability */
     margin-right: 8px;
-    margin-bottom: 0;
-    text-align: center;
+    margin-bottom: 0; /* No bottom margin in row layout */
+    text-align: center; /* Center text for smaller tab-like items */
   }
+  .sidebar-footer-nav {
+    /* Adjust for mobile */
+    width: auto; /* Allow it to shrink or grow based on content */
+    margin-left: auto; /* Pushes it to the right end in a row layout */
+    padding: 0 10px; /* Adjust padding for mobile */
+    align-self: center; /* Vertically center with other nav items */
+  }
+  .github-link-button {
+    white-space: nowrap; /* Prevent text wrapping on small button */
+  }
+
   .app-main-area {
     padding: 25px 15px 0 15px;
+  }
+  .main-content-wrapper {
+    padding-bottom: 30px;
   }
   .footer-text {
     font-size: 3rem;
@@ -314,8 +416,24 @@ select:disabled {
   .app-main-area {
     padding: 20px 10px 0 10px;
   }
+  .main-content-wrapper {
+    padding-bottom: 20px;
+  }
   .footer-text {
     font-size: 2.2rem;
     letter-spacing: 1px;
+  }
+  .button-animated {
+    padding: 10px 18px; /* Slightly adjust padding for very small screens */
+    font-size: 0.9rem;
+  }
+  .button-utility {
+    padding: 5px 10px; /* Adjust utility button padding */
+    font-size: 0.85em;
+  }
+  .github-link-button {
+    font-size: 0.8em !important;
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
   }
 }

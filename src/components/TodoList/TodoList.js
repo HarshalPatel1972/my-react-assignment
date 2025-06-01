@@ -1,60 +1,79 @@
 // src/components/TodoList/TodoList.js
-import React, { useState, useEffect } from "react";
-import "./TodoList.css";
+import React, { useState, useEffect, useCallback } from "react";
+import "./TodoList.css"; // We will update this later
+
+const LOCAL_STORAGE_KEY = "react-todo-list-tasks";
 
 const TodoList = () => {
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    // Load tasks from localStorage on initial render
+    try {
+      const storedTasks = localStorage.getItem(LOCAL_STORAGE_KEY);
+      return storedTasks ? JSON.parse(storedTasks) : [];
+    } catch (error) {
+      console.error("Error loading tasks from localStorage", error);
+      return [];
+    }
+  });
+
   const [newTaskText, setNewTaskText] = useState("");
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all"); // 'all', 'active', 'completed'
+  const [sortBy, setSortBy] = useState("date-desc"); // 'date-desc', 'date-asc', 'name-asc', 'name-desc'
 
-  // Placeholder for localStorage load
+  // Save tasks to localStorage whenever tasks array changes
   useEffect(() => {
-    console.log("TodoList mounted. Implement localStorage load here.");
-  }, []);
-
-  // Placeholder for localStorage save
-  useEffect(() => {
-    if (tasks.length > 0) {
-      // Only save if there are tasks, or on initial empty state if desired
-      console.log("Tasks changed. Implement localStorage save here.", tasks);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(tasks));
+    } catch (error) {
+      console.error("Error saving tasks to localStorage", error);
     }
   }, [tasks]);
 
   const handleInputChange = (e) => {
     setNewTaskText(e.target.value);
     if (error && e.target.value.trim() !== "") {
-      setError(""); // Clear error when user starts typing valid text
+      setError("");
     }
   };
 
-  const handleAddTask = (e) => {
-    e.preventDefault(); // Prevent form submission if it's in a form
-    const trimmedText = newTaskText.trim();
+  const validateTaskInput = (text) => {
+    const trimmedText = text.trim();
     if (!trimmedText) {
-      setError("Task cannot be empty.");
-      return;
+      return "Task cannot be empty.";
     }
     if (
       tasks.some(
-        (task) => task.text.toLowerCase() === trimmedText.toLowerCase()
+        (task) =>
+          task.text.toLowerCase() === trimmedText.toLowerCase() &&
+          !task.completed
       )
     ) {
-      setError("This task already exists.");
-      return;
+      // Only check against non-completed for duplicates
+      return "This active task already exists.";
     }
-    // Max length (optional)
-    if (trimmedText.length > 100) {
-      setError("Task text is too long (max 100 characters).");
+    if (trimmedText.length > 150) {
+      // Increased max length slightly
+      return "Task text is too long (max 150 characters).";
+    }
+    return ""; // No error
+  };
+
+  const handleAddTask = (e) => {
+    e.preventDefault();
+    const validationError = validateTaskInput(newTaskText);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     const newTask = {
-      id: Date.now(),
-      text: trimmedText,
+      id: Date.now(), // Using timestamp as a simple unique ID
+      text: newTaskText.trim(),
       completed: false,
+      createdAt: new Date().toISOString(), // For sorting by date
     };
-    setTasks((prevTasks) => [newTask, ...prevTasks]); // Add new tasks to the beginning
+    setTasks((prevTasks) => [newTask, ...prevTasks]); // Add to beginning for default newest first
     setNewTaskText("");
     setError("");
   };
@@ -75,19 +94,45 @@ const TodoList = () => {
     setFilter(newFilter);
   };
 
-  const getFilteredTasks = () => {
-    switch (filter) {
-      case "active":
-        return tasks.filter((task) => !task.completed);
-      case "completed":
-        return tasks.filter((task) => task.completed);
-      default: // 'all'
-        return tasks;
-    }
+  const handleSetSortBy = (e) => {
+    setSortBy(e.target.value);
   };
 
-  const filteredTasks = getFilteredTasks();
+  const getProcessedTasks = useCallback(() => {
+    let processed = [...tasks];
+
+    // 1. Filter
+    if (filter === "active") {
+      processed = processed.filter((task) => !task.completed);
+    } else if (filter === "completed") {
+      processed = processed.filter((task) => task.completed);
+    }
+
+    // 2. Sort
+    switch (sortBy) {
+      case "date-asc":
+        processed.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        break;
+      case "name-asc":
+        processed.sort((a, b) => a.text.localeCompare(b.text));
+        break;
+      case "name-desc":
+        processed.sort((a, b) => b.text.localeCompare(a.text));
+        break;
+      case "date-desc": // Default
+      default:
+        processed.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+    }
+    return processed;
+  }, [tasks, filter, sortBy]);
+
+  const processedTasks = getProcessedTasks();
   const activeTaskCount = tasks.filter((task) => !task.completed).length;
+
+  const handleClearCompleted = () => {
+    setTasks((prevTasks) => prevTasks.filter((task) => !task.completed));
+  };
 
   return (
     <div className="todo-list-container">
@@ -95,69 +140,84 @@ const TodoList = () => {
       <form onSubmit={handleAddTask} className="todo-add-form">
         <input
           type="text"
-          className="todo-input"
+          // className="todo-input" // Will rely on common input style from App.css or .common-input-style
+          className="common-input-style todo-input-specifics" // Use common and add specific if needed
           value={newTaskText}
           onChange={handleInputChange}
           placeholder="What needs to be done?"
+          aria-label="New task input"
         />
-        <button type="submit" className="todo-add-button">
-          Add Task
+        {/* Updated Add Task Button */}
+        <button
+          type="submit"
+          className="button-animated todo-add-button-specifics"
+        >
+          <span className="button-text">Add Task</span>
+          <span className="button-icon-right">→</span>
         </button>
       </form>
-      {error && <p className="todo-error-message">{error}</p>}
-
+      {error && <p className="error-message">{error}</p>}{" "}
+      {/* Uses common .error-message from App.css */}
       <div className="todo-controls">
         <span className="todo-count">
           {activeTaskCount} item{activeTaskCount !== 1 ? "s" : ""} left
         </span>
         <div className="todo-filters">
+          {/* Updated Filter Buttons */}
           <button
             onClick={() => handleSetFilter("all")}
-            className={filter === "all" ? "active" : ""}
+            className={`button-utility ${filter === "all" ? "active" : ""}`}
           >
             All
           </button>
           <button
             onClick={() => handleSetFilter("active")}
-            className={filter === "active" ? "active" : ""}
+            className={`button-utility ${filter === "active" ? "active" : ""}`}
           >
             Active
           </button>
           <button
             onClick={() => handleSetFilter("completed")}
-            className={filter === "completed" ? "active" : ""}
+            className={`button-utility ${
+              filter === "completed" ? "active" : ""
+            }`}
           >
             Completed
           </button>
         </div>
+        <div className="todo-sort">
+          <label htmlFor="sort-tasks" className="todo-sort-label">
+            Sort by:{" "}
+          </label>
+          <select
+            id="sort-tasks"
+            value={sortBy}
+            onChange={handleSetSortBy}
+            className="todo-sort-select"
+          >
+            <option value="date-desc">Newest First</option>
+            <option value="date-asc">Oldest First</option>
+            <option value="name-asc">Name (A-Z)</option>
+            <option value="name-desc">Name (Z-A)</option>
+          </select>
+        </div>
         {tasks.some((task) => task.completed) && (
           <button
-            className="todo-clear-completed"
-            onClick={() =>
-              setTasks((prevTasks) =>
-                prevTasks.filter((task) => !task.completed)
-              )
-            }
+            className="button-utility todo-clear-completed-specifics"
+            onClick={handleClearCompleted}
           >
             Clear Completed
           </button>
         )}
       </div>
-
-      {filteredTasks.length === 0 && filter === "all" && (
-        <p className="todo-empty-message">No tasks yet. Add some!</p>
+      {processedTasks.length === 0 && tasks.length > 0 && (
+        <p className="todo-empty-message">No tasks match the current filter.</p>
       )}
-      {filteredTasks.length === 0 && filter === "active" && (
-        <p className="todo-empty-message">
-          No active tasks. Great job or add more!
-        </p>
+      {tasks.length === 0 && (
+        <p className="todo-empty-message">No tasks yet. Add your first one!</p>
       )}
-      {filteredTasks.length === 0 && filter === "completed" && (
-        <p className="todo-empty-message">No completed tasks yet.</p>
-      )}
-
       <ul className="todo-items-list">
-        {filteredTasks.map((task) => (
+        {processedTasks.map((task) => (
           <li
             key={task.id}
             className={`todo-item ${task.completed ? "completed" : ""}`}
@@ -174,17 +234,17 @@ const TodoList = () => {
               />
               <span className="todo-item-text">{task.text}</span>
             </div>
+            {/* Updated Remove Task Button */}
             <button
               onClick={() => handleRemoveTask(task.id)}
-              className="todo-remove-button"
+              className="button-utility todo-remove-button-specifics"
               aria-label={`Remove task "${task.text}"`}
             >
-              × {/* Times symbol for remove */}
+              ×
             </button>
           </li>
         ))}
       </ul>
-      {/* Optional: Sorting controls can go here */}
     </div>
   );
 };
